@@ -173,64 +173,6 @@ using-git-worktrees = 辅助机制
 
 这个判断很重要。它能帮你把 Superpowers 当成一套流程来用，而不是把它误解成一堆需要全部记住的命令。
 
-## 用本项目举个完整例子
-
-### 例子一：从零做图书收藏 API
-
-一开始我们不是直接写 Java，而是先写了中文 spec：
-
-- 要做一个图书收藏 API
-- 使用 Spring Boot 3
-- 使用 H2 做本地持久化
-- 用 MockMvc 做集成测试
-- 第一阶段不做登录、分页、搜索、Docker
-
-然后写 implementation plan，把工作拆成：
-
-- 初始化 Maven 项目
-- 实现创建图书
-- 实现列表查询
-- 实现标记已读
-- 实现删除图书
-- 补充错误处理
-- 跑全量测试
-
-实现时我们用了 worktree，避免直接在 `main` 上改。完成后做了代码审查、测试验证，再合并回 `main`，最后推送到 GitHub。
-
-### 例子二：新增 `GET /api/books/{id}`
-
-后来我们又加了一个接口：
-
-```text
-GET /api/books/{id}
-```
-
-这次需求看起来很小，但 Superpowers 仍然要求先澄清。
-
-我们先确认了一个关键点：成功响应复用现有 `BookResponse`。
-
-然后写 spec，明确：
-
-- id 存在时返回 `200 OK`
-- id 不存在时返回 `404 Not Found`
-- 错误响应继续使用：
-
-```json
-{
-  "message": "Book not found"
-}
-```
-
-接着写 plan，再用 `subagent-driven-development` 执行：
-
-- Task 1：改 `BookService` 和 `BookController`
-- Task 2：补 MockMvc 测试
-- 每个 Task 后都做规格审查和代码质量审查
-- 最后跑 `mvn test`
-- 合并回 `main`
-
-这个例子说明：即使只是一个小接口，也可以用很轻量的 spec 和 plan 把事情做稳。
-
 ## 新手使用建议
 
 如果你刚开始用 Superpowers，我建议先记住这些：
@@ -365,6 +307,64 @@ mvn test = 本项目里最常用的验证方式
 | 丢弃分支 | 这次只是实验或方向不对，不保留这些改动。 |
 
 它的重点不是“必须合并”，而是提醒你：开发完成后，要明确选择下一步，不要让分支和改动一直悬在那里。
+
+## 用本项目举个完整例子
+
+### 例子一：从零做图书收藏 API
+
+一开始我们不是直接写 Java，而是先写了中文 spec：
+
+- 要做一个图书收藏 API
+- 使用 Spring Boot 3
+- 使用 H2 做本地持久化
+- 用 MockMvc 做集成测试
+- 第一阶段不做登录、分页、搜索、Docker
+
+然后写 implementation plan，把工作拆成：
+
+- 初始化 Maven 项目
+- 实现创建图书
+- 实现列表查询
+- 实现标记已读
+- 实现删除图书
+- 补充错误处理
+- 跑全量测试
+
+实现时我们用了 worktree，避免直接在 `main` 上改。完成后做了代码审查、测试验证，再合并回 `main`，最后推送到 GitHub。
+
+### 例子二：新增 `GET /api/books/{id}`
+
+后来我们又加了一个接口：
+
+```text
+GET /api/books/{id}
+```
+
+这次需求看起来很小，但 Superpowers 仍然要求先澄清。
+
+我们先确认了一个关键点：成功响应复用现有 `BookResponse`。
+
+然后写 spec，明确：
+
+- id 存在时返回 `200 OK`
+- id 不存在时返回 `404 Not Found`
+- 错误响应继续使用：
+
+```json
+{
+  "message": "Book not found"
+}
+```
+
+接着写 plan，再用 `subagent-driven-development` 执行：
+
+- Task 1：改 `BookService` 和 `BookController`
+- Task 2：补 MockMvc 测试
+- 每个 Task 后都做规格审查和代码质量审查
+- 最后跑 `mvn test`
+- 合并回 `main`
+
+这个例子说明：即使只是一个小接口，也可以用很轻量的 spec 和 plan 把事情做稳。
 
 ## 项目当前 API
 

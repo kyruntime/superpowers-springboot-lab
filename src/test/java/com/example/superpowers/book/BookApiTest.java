@@ -127,6 +127,39 @@ class BookApiTest {
     }
 
     @Test
+    void getExistingBookReturnsBookDetails() throws Exception {
+        String response = mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": "Clean Code",
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Number id = com.jayway.jsonpath.JsonPath.read(response, "$.id");
+
+        mockMvc.perform(get("/api/books/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.longValue()))
+                .andExpect(jsonPath("$.title").value("Clean Code"))
+                .andExpect(jsonPath("$.author").value("Robert C. Martin"))
+                .andExpect(jsonPath("$.read").value(false))
+                .andExpect(jsonPath("$.createdAt", notNullValue()));
+    }
+
+    @Test
+    void getMissingBookReturnsNotFound() throws Exception {
+        mockMvc.perform(get("/api/books/{id}", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Book not found"));
+    }
+
+    @Test
     void markExistingBookAsReadReturnsUpdatedBook() throws Exception {
         String response = mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -69,12 +69,14 @@ Superpowers 想解决的就是这个问题。它把开发拆成一串比较稳�
 2. 写中文 spec，确认到底要做什么
 3. 用 `writing-plans` 写 implementation plan
 4. 用 `using-git-worktrees` 创建隔离 worktree
-5. 选择执行方式：`executing-plans` 或 `subagent-driven-development`
+5. 用 `executing-plans` 按计划执行
 6. 实现功能
 7. 用 reviewer 子代理做规格审查和代码质量审查
 8. 用 `verification-before-completion` 重新跑测试
 9. 用 `finishing-a-development-branch` 合并或保留分支
 10. 最后推送到 GitHub
+
+如果任务比较复杂，也可以把第 5 步换成 `subagent-driven-development`，让子代理拆任务并行处理。它属于特定场景增强，不是你每天都要手动触发的主流程节点。
 
 ## 流程图
 
@@ -84,11 +86,10 @@ flowchart TD
     B --> C["写 spec<br/>把设计落成文档"]
     C --> D["writing-plans<br/>写实现计划"]
     D --> E["using-git-worktrees<br/>创建隔离工作区"]
-    E --> F{"选择执行方式"}
-    F --> G["executing-plans<br/>本会话按计划执行"]
-    F --> H["subagent-driven-development<br/>子代理分任务执行"]
-    G --> I["实现功能"]
-    H --> I
+    E --> F["executing-plans<br/>本会话按计划执行"]
+    F -. "复杂任务可选" .-> G["subagent-driven-development<br/>子代理分任务执行"]
+    F --> I["实现功能"]
+    G --> I
     I --> J["requesting-code-review<br/>代码审查"]
     J --> K["verification-before-completion<br/>重新运行验证命令"]
     K --> L["finishing-a-development-branch<br/>合并、PR、保留或丢弃"]
@@ -97,7 +98,9 @@ flowchart TD
 
 ## 常见 skill 速查
 
-下面这些 skill 可以理解成 Superpowers 流程里的“工具卡片”。你不用一开始全背下来，先知道它们大概负责什么就行。
+Superpowers 不是所有 skill 都需要你手动点名。
+
+更准确地说，skill 可以分成三类：用户经常直接触发的“主流程节点”、Agent 在流程中自动或半自动调用的“辅助机制”，以及只在特定场景才会用到的“插件式增强”。你不用一开始背完整列表，先知道它们分别处在开发流程的哪个位置就行。
 
 | Skill | 作用 | 什么时候用 | 实际会做什么 |
 | --- | --- | --- | --- |
@@ -110,17 +113,19 @@ flowchart TD
 | `finishing-a-development-branch` | 收尾分支 | 测试通过后，选择合并、PR、保留或丢弃 | 引导你选择下一步：合并、开 PR、保留分支，或丢弃实验性改动。 |
 | `using-git-worktrees` | 创建隔离工作区 | 执行计划前，避免污染主分支 | 创建独立 worktree，在隔离目录里开发，减少和主分支或其他任务互相干扰。 |
 
-## 哪些 skill 是用户常用的
+## 1. 用户常用的主流程 skill
 
-你作为使用者，最常主动点名的是这些：
+这些是你作为用户最常直接用的 skill。它们对应真实开发阶段：
 
-- `brainstorming`
-- `writing-plans`
-- `executing-plans`
-- `subagent-driven-development`
-- `requesting-code-review`
-- `verification-before-completion`
-- `finishing-a-development-branch`
+```text
+brainstorming
+writing-plans
+executing-plans
+requesting-code-review
+verification-before-completion
+finishing-a-development-branch
+systematic-debugging
+```
 
 一个比较顺手的口诀是：
 
@@ -131,20 +136,82 @@ flowchart TD
 对应到 skill：
 
 ```text
-brainstorming -> writing-plans -> executing-plans/subagent-driven-development -> requesting-code-review -> verification-before-completion -> finishing-a-development-branch
+brainstorming
+-> writing-plans
+-> executing-plans
+-> requesting-code-review
+-> verification-before-completion
+-> finishing-a-development-branch
 ```
 
-## 哪些 skill 更像内部辅助组件
+如果是在修 bug，中间通常会插入：
 
-有些 skill 或子代理，你不一定每天直接点名，但它们在流程里很重要：
+```text
+systematic-debugging
+```
 
-- `using-git-worktrees`：帮你创建隔离工作区，避免在 `main` 上直接乱改。
-- 实现子代理：负责某个具体任务，比如只改 Controller 和 Service。
-- 规格审查子代理：检查“有没有按 spec 做”，防止做少或做多。
-- 代码质量审查子代理：检查代码风格、边界、风险和可维护性。
-- 最终代码审查子代理：合并前再整体看一遍。
+它负责先定位问题、复现现象、验证假设，再进入修复，而不是看到报错就马上猜一个改法。
 
-这些东西有点像厨房里的备菜、试味和出餐检查。用户看到的是一道菜，流程里其实有很多小关卡在防止翻车。
+## 2. 半自动或内部辅助 skill
+
+这些 skill 通常不是你主动点名，而是在主流程里被 Agent 用来保证执行更稳：
+
+- `using-git-worktrees`
+- `test-driven-development`
+- `receiving-code-review`
+
+### `using-git-worktrees`
+
+这是执行前的隔离策略。
+
+你一般不会一上来就说“使用 `using-git-worktrees`”。更常见的情况是：写完 plan 之后，准备执行之前，Agent 判断这次会改代码，于是自动创建一个隔离 worktree。
+
+它解决的是一个很实际的问题：不要把实验性修改直接混在当前分支里。
+
+### `test-driven-development`
+
+如果 plan 里明确写了 TDD，执行阶段就会按这个方式走：先写失败测试，再实现功能，再让测试通过。
+
+你也可以手动要求：
+
+```text
+这一步使用 test-driven-development。
+```
+
+但更多时候，它是执行计划的一部分，而不是一个单独的入口。
+
+### `receiving-code-review`
+
+这个通常配合 `requesting-code-review` 使用。
+
+一个负责发起审查，另一个负责接收、理解和处理审查意见。重点不是“审查说什么都照做”，而是判断反馈是否准确、是否需要改、改完后是否还要重新验证。
+
+## 3. 特定场景 skill
+
+这些不是主流程必须项，有对应场景才会用：
+
+| Skill | 适合场景 |
+| --- | --- |
+| `frontend-design` | 做前端页面、组件、视觉优化或交互设计。 |
+| `subagent-driven-development` | 任务可以拆成多个独立部分，希望子代理并行执行和审查。 |
+| `dispatching-parallel-agents` | 有多个互不依赖的问题，可以并行调查或处理。 |
+| `writing-skills` | 你想自己写新的 skill，或改已有 skill。 |
+| `jira-worktime-summary` | 从 Jira 汇总工时、成本、人力投入和阶段统计。 |
+
+所以看到一个 skill 时，先不要问“我要不要手动点它”，而是先问：
+
+```text
+它是一个开发阶段，还是一个辅助机制？
+```
+
+例如：
+
+```text
+writing-plans = 开发阶段
+using-git-worktrees = 辅助机制
+```
+
+这个判断很重要。它能帮你把 Superpowers 当成一套流程来用，而不是把它误解成一堆需要全部记住的命令。
 
 ## 用本项目举个完整例子
 

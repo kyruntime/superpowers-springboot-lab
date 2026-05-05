@@ -1,6 +1,6 @@
 # 图书收藏 API Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **面向代理式执行者：** 必须使用子技能 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans`，按任务逐项落实本计划。步骤使用复选框（`- [ ]`）语法以便跟踪进度。
 
 **Goal:** 构建一个 Spring Boot 3 图书收藏 API，支持创建、查询、标记已读和删除收藏图书。
 
@@ -1148,9 +1148,9 @@ git commit -m "test: verify book api behavior"
 
 ## 执行选项
 
-Plan complete and saved to `docs/superpowers/plans/2026-05-05-book-collection-api-implementation.md`. Two execution options:
+计划已完成并保存至 `docs/superpowers/plans/2026-05-05-book-collection-api-implementation.md`。有两种执行方式：
 
-1. **Subagent-Driven (recommended)** - dispatch a fresh subagent per task, review between tasks, fast iteration
-2. **Inline Execution** - execute tasks in this session using executing-plans, batch execution with checkpoints
+1. **子代理驱动（推荐）** —— 每个任务派生子代理从头处理，任务之间做评审，迭代更快。
+2. **本会话内联执行** —— 在本对话中用 `executing-plans` 按检查点批量执行任务。
 
-Which approach?
+选用哪一种？

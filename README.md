@@ -6,35 +6,6 @@
 
 如果你刚开始用 AI 写代码，这个项目最值得看的不是某一行 Java，而是这套流程：它能帮你少一点“AI 直接开写然后写偏了”的痛苦。
 
-## 这个项目是什么
-
-项目本身是一个个人图书收藏 API，当前支持：
-
-```text
-POST   /api/books           创建一本收藏图书
-GET    /api/books           查询收藏图书列表
-GET    /api/books/{id}      根据 id 查询单本图书
-PATCH  /api/books/{id}/read 将一本图书标记为已读
-DELETE /api/books/{id}      删除一本收藏图书
-```
-
-技术栈很朴素：
-
-- Spring Boot 3
-- JDK 17
-- Maven
-- Spring Web
-- Spring Data JPA
-- H2
-- JUnit 5
-- MockMvc
-
-代码结构也刻意保持简单：
-
-```text
-BookController -> BookService -> BookRepository -> H2 Database
-```
-
 ## Superpowers 是什么
 
 你可以把 Superpowers 理解成一套“让 AI 编程更有章法”的工作流。

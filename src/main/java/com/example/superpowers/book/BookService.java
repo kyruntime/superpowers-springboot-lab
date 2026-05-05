@@ -28,4 +28,12 @@ public class BookService {
                 .map(BookResponse::from)
                 .toList();
     }
+
+    @Transactional
+    public BookResponse markAsRead(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+        book.markAsRead();
+        return BookResponse.from(book);
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.superpowers.common;
 
+import com.example.superpowers.book.BookNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,5 +20,11 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getDefaultMessage())
                 .orElse("Validation failed");
         return new ErrorResponse(message);
+    }
+
+    @ExceptionHandler(BookNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleBookNotFound(BookNotFoundException exception) {
+        return new ErrorResponse("Book not found");
     }
 }

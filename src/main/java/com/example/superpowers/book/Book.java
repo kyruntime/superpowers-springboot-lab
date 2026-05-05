@@ -57,4 +57,8 @@ public class Book {
     public Instant getCreatedAt() {
         return createdAt;
     }
+
+    public void markAsRead() {
+        this.read = true;
+    }
 }

@@ -99,16 +99,16 @@ flowchart TD
 
 下面这些 skill 可以理解成 Superpowers 流程里的“工具卡片”。你不用一开始全背下来，先知道它们大概负责什么就行。
 
-| Skill | 作用 | 什么时候用 |
-| --- | --- | --- |
-| `brainstorming` | 把模糊想法变成清楚设计 | 新功能、改行为、写重要文档前 |
-| `writing-plans` | 把 spec 拆成可执行计划 | 设计确认后、动手实现前 |
-| `executing-plans` | 在当前会话按计划执行 | 想让 AI 一步步直接做 |
-| `subagent-driven-development` | 派子代理分任务实现和审查 | 任务稍复杂、希望更稳时 |
-| `requesting-code-review` | 请求代码审查 | 功能完成后、合并前 |
-| `verification-before-completion` | 完成前重新验证 | 说“完成”“通过”“可合并”之前 |
-| `finishing-a-development-branch` | 收尾分支 | 测试通过后，选择合并、PR、保留或丢弃 |
-| `using-git-worktrees` | 创建隔离工作区 | 执行计划前，避免污染主分支 |
+| Skill | 作用 | 什么时候用 | 实际会做什么 |
+| --- | --- | --- | --- |
+| `brainstorming` | 把模糊想法变成清楚设计 | 新功能、改行为、写重要文档前 | 通过提问澄清目标、边界、取舍和验收标准，先把“想做什么”说清楚。 |
+| `writing-plans` | 把 spec 拆成可执行计划 | 设计确认后、动手实现前 | 把需求拆成文件级步骤、测试点、验证命令和风险提示，形成可照着执行的 plan。 |
+| `executing-plans` | 在当前会话按计划执行 | 想让 AI 一步步直接做 | 按 plan 逐项实现、阶段性检查结果，遇到偏差时停下来修正执行路线。 |
+| `subagent-driven-development` | 派子代理分任务实现和审查 | 任务稍复杂、希望更稳时 | 把独立任务分给子代理并行处理，再汇总代码、审查结果和遗留问题。 |
+| `requesting-code-review` | 请求代码审查 | 功能完成后、合并前 | 让另一个审查视角检查 bug、回归风险、遗漏测试和需求不匹配的地方。 |
+| `verification-before-completion` | 完成前重新验证 | 说“完成”“通过”“可合并”之前 | 先运行能证明结果的命令，读完整输出，再根据证据判断是否真的完成。 |
+| `finishing-a-development-branch` | 收尾分支 | 测试通过后，选择合并、PR、保留或丢弃 | 引导你选择下一步：合并、开 PR、保留分支，或丢弃实验性改动。 |
+| `using-git-worktrees` | 创建隔离工作区 | 执行计划前，避免污染主分支 | 创建独立 worktree，在隔离目录里开发，减少和主分支或其他任务互相干扰。 |
 
 ## 哪些 skill 是用户常用的
 

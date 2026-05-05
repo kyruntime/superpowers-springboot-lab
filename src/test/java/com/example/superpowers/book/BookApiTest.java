@@ -36,4 +36,18 @@ class BookApiTest {
                 .andExpect(jsonPath("$.read").value(false))
                 .andExpect(jsonPath("$.createdAt", notNullValue()));
     }
+
+    @Test
+    void createBookWithBlankTitleReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": "   ",
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Title must not be blank"));
+    }
 }

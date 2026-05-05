@@ -35,6 +35,11 @@ public class BookController {
         return bookService.listBooks();
     }
 
+    @GetMapping("/{id}")
+    public BookResponse getBook(@PathVariable Long id) {
+        return bookService.getBook(id);
+    }
+
     @PatchMapping("/{id}/read")
     public BookResponse markAsRead(@PathVariable Long id) {
         return bookService.markAsRead(id);

@@ -29,6 +29,13 @@ public class BookService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public BookResponse getBook(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+        return BookResponse.from(book);
+    }
+
     @Transactional
     public BookResponse markAsRead(Long id) {
         Book book = bookRepository.findById(id)

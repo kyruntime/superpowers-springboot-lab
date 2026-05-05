@@ -1,5 +1,6 @@
 package com.example.superpowers.book;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,6 +20,14 @@ class BookApiTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    @BeforeEach
+    void cleanDatabase() {
+        bookRepository.deleteAll();
+    }
 
     @Test
     void createBookReturnsCreatedBook() throws Exception {
@@ -49,5 +59,41 @@ class BookApiTest {
                         """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Title must not be blank"));
+    }
+
+    @Test
+    void listBooksReturnsEmptyArrayWhenNoBooksExist() throws Exception {
+        mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void listBooksReturnsBooksInStableOrder() throws Exception {
+        mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": "Clean Code",
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": "Refactoring",
+                          "author": "Martin Fowler"
+                        }
+                        """))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Clean Code"))
+                .andExpect(jsonPath("$[1].title").value("Refactoring"));
     }
 }

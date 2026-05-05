@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class BookService {
@@ -18,5 +19,13 @@ public class BookService {
     public BookResponse createBook(CreateBookRequest request) {
         Book book = new Book(request.title(), request.author(), false, Instant.now());
         return BookResponse.from(bookRepository.save(book));
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookResponse> listBooks() {
+        return bookRepository.findAllByOrderByCreatedAtAscIdAsc()
+                .stream()
+                .map(BookResponse::from)
+                .toList();
     }
 }

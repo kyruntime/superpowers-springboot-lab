@@ -64,6 +64,33 @@ class BookApiTest {
     }
 
     @Test
+    void createBookWithMissingTitleReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Title must not be blank"));
+    }
+
+    @Test
+    void createBookWithNullTitleReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": null,
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Title must not be blank"));
+    }
+
+    @Test
     void listBooksReturnsEmptyArrayWhenNoBooksExist() throws Exception {
         mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
@@ -127,6 +154,32 @@ class BookApiTest {
         mockMvc.perform(patch("/api/books/{id}/read", 999L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Book not found"));
+    }
+
+    @Test
+    void markAlreadyReadBookAsReadIsIdempotent() throws Exception {
+        String response = mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": "Clean Code",
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Number id = com.jayway.jsonpath.JsonPath.read(response, "$.id");
+
+        mockMvc.perform(patch("/api/books/{id}/read", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.read").value(true));
+
+        mockMvc.perform(patch("/api/books/{id}/read", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.read").value(true));
     }
 
     @Test

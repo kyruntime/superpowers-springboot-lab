@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -124,6 +125,38 @@ class BookApiTest {
     @Test
     void markMissingBookAsReadReturnsNotFound() throws Exception {
         mockMvc.perform(patch("/api/books/{id}/read", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Book not found"));
+    }
+
+    @Test
+    void deleteExistingBookRemovesItFromList() throws Exception {
+        String response = mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "title": "Clean Code",
+                          "author": "Robert C. Martin"
+                        }
+                        """))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Number id = com.jayway.jsonpath.JsonPath.read(response, "$.id");
+
+        mockMvc.perform(delete("/api/books/{id}", id))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void deleteMissingBookReturnsNotFound() throws Exception {
+        mockMvc.perform(delete("/api/books/{id}", 999L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Book not found"));
     }

@@ -36,4 +36,12 @@ public class BookService {
         book.markAsRead();
         return BookResponse.from(book);
     }
+
+    @Transactional
+    public void deleteBook(Long id) {
+        if (!bookRepository.existsById(id)) {
+            throw new BookNotFoundException(id);
+        }
+        bookRepository.deleteById(id);
+    }
 }

@@ -6,7 +6,7 @@
 
 如果你刚开始用 AI 写代码，这个项目最值得看的不是某一行 Java，而是这套流程：它能帮你少一点“AI 直接开写然后写偏了”的痛苦。
 
-## Superpowers 是什么
+## 1. Superpowers 是什么
 
 你可以把 Superpowers 理解成一套“让 AI 编程更有章法”的工作流。
 
@@ -32,7 +32,7 @@ Superpowers 想解决的就是这个问题。它把开发拆成一串比较稳�
 
 它不是让流程变复杂，而是把容易出错的地方提前拦住。
 
-## 我们用 Superpowers 跑过的一整套流程
+## 2. 我们用 Superpowers 跑过的一整套流程
 
 这次项目里，我们大概按这个节奏走：
 
@@ -49,7 +49,7 @@ Superpowers 想解决的就是这个问题。它把开发拆成一串比较稳�
 
 如果任务比较复杂，也可以把第 5 步换成 `subagent-driven-development`，让子代理拆任务并行处理。它属于复杂任务的可选执行方式，不是你每天都要手动触发的主流程节点。
 
-## 流程图
+## 3. 流程图
 
 ```mermaid
 flowchart TD
@@ -67,7 +67,7 @@ flowchart TD
     L --> M["GitHub<br/>推送代码"]
 ```
 
-## 常见 skill 速查
+## 4. 常见 skill 速查
 
 Superpowers 不是所有 skill 都需要你手动点名。
 
@@ -85,7 +85,7 @@ Superpowers 不是所有 skill 都需要你手动点名。
 | `systematic-debugging` | 系统化调试 | 修 bug、排查测试失败或异常行为时 | 先复现问题、收集证据、验证假设，再决定怎么修，避免凭感觉改代码。 |
 | `using-git-worktrees` | 创建隔离工作区 | 执行计划前，避免污染主分支 | 创建独立 worktree，在隔离目录里开发，减少和主分支或其他任务互相干扰。 |
 
-## 1. 用户常用的主流程 skill
+### 4.1 用户常用的主流程 skill
 
 这些是你作为用户最常直接用的 skill。它们对应真实开发阶段：
 
@@ -124,7 +124,7 @@ systematic-debugging
 
 它负责先定位问题、复现现象、验证假设，再进入修复，而不是看到报错就马上猜一个改法。
 
-## 2. 半自动或内部辅助 skill
+### 4.2 半自动或内部辅助 skill
 
 这些 skill 通常不是你主动点名，而是在主流程里被 Agent 用来保证执行更稳：
 
@@ -132,7 +132,7 @@ systematic-debugging
 - `test-driven-development`
 - `receiving-code-review`
 
-### `using-git-worktrees`
+#### 4.2.1 `using-git-worktrees`
 
 这是执行前的隔离策略。
 
@@ -140,7 +140,7 @@ systematic-debugging
 
 它解决的是一个很实际的问题：不要把实验性修改直接混在当前分支里。
 
-### `test-driven-development`
+#### 4.2.2 `test-driven-development`
 
 如果 plan 里明确写了 TDD，执行阶段就会按这个方式走：先写失败测试，再实现功能，再让测试通过。
 
@@ -152,7 +152,7 @@ systematic-debugging
 
 但更多时候，它是执行计划的一部分，而不是一个单独的入口。
 
-### `receiving-code-review`
+#### 4.2.3 `receiving-code-review`
 
 这个通常配合 `requesting-code-review` 使用。
 
@@ -173,7 +173,7 @@ using-git-worktrees = 辅助机制
 
 这个判断很重要。它能帮你把 Superpowers 当成一套流程来用，而不是把它误解成一堆需要全部记住的命令。
 
-## 新手使用建议
+## 5. 新手使用建议
 
 如果你刚开始用 Superpowers，我建议先记住这些：
 
@@ -195,7 +195,7 @@ using-git-worktrees = 辅助机制
 6. 学会问“下一步应该用哪个 skill”  
    这很有用，能帮你把流程接上，不会做到一半乱掉。
 
-## 新手常见问题 Q&A
+## 6. 新手常见问题 Q&A
 
 ### Q：spec 和 plan 有什么区别？
 
@@ -308,9 +308,9 @@ mvn test = 本项目里最常用的验证方式
 
 它的重点不是“必须合并”，而是提醒你：开发完成后，要明确选择下一步，不要让分支和改动一直悬在那里。
 
-## 用本项目举个完整例子
+## 7. 用本项目举个完整例子
 
-### 例子一：从零做图书收藏 API
+### 7.1 例子一：从零做图书收藏 API
 
 一开始我们不是直接写 Java，而是先写了中文 spec：
 
@@ -332,7 +332,7 @@ mvn test = 本项目里最常用的验证方式
 
 实现时我们用了 worktree，避免直接在 `main` 上改。完成后做了代码审查、测试验证，再合并回 `main`，最后推送到 GitHub。
 
-### 例子二：新增 `GET /api/books/{id}`
+### 7.2 例子二：新增 `GET /api/books/{id}`
 
 后来我们又加了一个接口：
 
@@ -366,7 +366,7 @@ GET /api/books/{id}
 
 这个例子说明：即使只是一个小接口，也可以用很轻量的 spec 和 plan 把事情做稳。
 
-## 项目当前 API
+## 8. 项目当前 API
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -376,7 +376,7 @@ GET /api/books/{id}
 | `PATCH` | `/api/books/{id}/read` | 将图书标记为已读 |
 | `DELETE` | `/api/books/{id}` | 删除一本收藏图书 |
 
-## 本地运行与测试
+## 9. 本地运行与测试
 
 运行测试：
 
@@ -396,7 +396,7 @@ mvn test
 
 如果测试通过，说明当前 API 的核心行为是稳定的。
 
-## 最后一句
+## 10. 最后一句
 
 Superpowers 的重点不是“多几个步骤”，而是让 AI 编程从随手一改，变成有设计、有计划、有验证、有收尾。
 
